@@ -2,6 +2,7 @@
 var express       = require('express'),
     bodyParser    = require('body-parser'),
     morgan        = require('morgan');
+    mongoose      = require('mongoose');
 
 //*modules
     config        = require('./config');
@@ -9,6 +10,16 @@ var express       = require('express'),
 
 //instance of objects
     var app       = express();
+
+//D A T A B A S E connect
+mongoose.connect(config.database, function(err) {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log("Connected to MLab MongoDB")
+  }
+
+});
 
 //M I D D L E W A R E 
     app.use(bodyParser.urlencoded({
