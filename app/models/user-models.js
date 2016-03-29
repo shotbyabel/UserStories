@@ -39,4 +39,14 @@ UserSchema.pre('save', function(next) {
 
 });
 
+//method password compared to DB
+UserSchema.methods.comparePassword = function(password) {
+
+  var user = this;
+//bcrypt uses compareSync method to match password user JUST ented and 'user.password' which is in our BD
+  return bcrypt.compareSync(password, user.password);
+}
+
+
+
 module.exports = mongoose.model('User', UserSchema);
