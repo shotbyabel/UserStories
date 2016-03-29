@@ -18,7 +18,7 @@ var express       = require('express'),
     app.use(morgan('dev'));//logger
 
 //    
-    app.get('*', function(req, res) {
+    app.get('*', function(req, res) {// '*' is like /otherwise in UI router
       res.sendFile(__dirname + '/public/views/index.html');
     });
   
