@@ -59,7 +59,8 @@ module.exports = function(app, express) {
     }); //mongoose find method
   });
 
-//
+///////////////////////////////////////
+//L O G I N  R O U T E w/JWT DESTINATION A
   api.post('/login', function(req, res) {
 
     User.findOne({
@@ -99,6 +100,46 @@ module.exports = function(app, express) {
 
     });
 
+  });
+///
+//MIDDLEWARE //After user succesfully logs in...check for authentication: MIDDLEWARE
+  api.use(function(req, res, next) {
+    console.log("User entered the app!");
+    //CHECK for the token.. token is stored here.. body or headers.. 
+    var token = req.body.token || req.param('token') || req.headers['x-access-token'];
+    //VERIFY if token exist
+    if (token) {
+      //use our jwt object 
+      jwt.verify(token, secretKey, function(err, decoded) {
+
+        if (err) {
+          res.status(403).send({
+            success: false,
+            message: "Failed to authenticate user"
+          });
+
+        } else {
+          //
+          req.decoded = decoded;
+
+          next();
+        }
+      });
+      //VERIFY if token DOES NOT exist    
+    } else {
+
+      res.status(403).send({
+        success: false,
+        message: "There's no token!"
+      });
+
+    }
+  });
+
+  //Legitimate Token DESTINATION B
+  //Home Route
+  api.get('/', function(req, res) {
+    res.json("Home Route! Home fly!");
   });
 
       return api
