@@ -1,4 +1,5 @@
 var User        = require('../models/user-models'),
+    Story       = require('../models/story-models'),
     config      = require('../../config'),//to use our secretKey
     secretKey   = config.secretKey;
 //*1 -
@@ -8,7 +9,7 @@ var jwt         = require('jsonwebtoken');
 function createToken(user) {
 
   var token = jwt.sign({
-    _id: user._id,
+    id: user._id,
     name: user.name,
     username: user.username
   }, secretKey, {
@@ -120,7 +121,7 @@ module.exports = function(app, express) {
 
         } else {
           //
-          req.decoded = decoded;
+          req.decoded = decoded;//user successfully has a token!
 
           next();
         }
@@ -138,9 +139,56 @@ module.exports = function(app, express) {
 
   //Legitimate Token DESTINATION B
   //Home Route
-  api.get('/', function(req, res) {
-    res.json("Home Route! Home fly!");
+  // api.get('/', function(req, res) {
+  //   res.json("Home Route! Home fly!");
+  // });
+
+  //chaining method to perform multiple http methods on a single route
+  api.route('/')
+
+  .post(function(req, res) {
+
+    var story = new Story({
+      creator: req.decoded.id,
+      content: req.body.content
+
+    });
+
+    story.save(function(err) {
+      if (err) {
+        res.send(err);
+        return
+      }
+
+      res.json({
+        message: "Story has been created!"
+      })
+
+    })
+
+  })
+  //get user's stories
+  .get(function(req, res) {
+
+    Story.find({
+      creator: req.decoded.id
+    }, function(err, stories) {
+      if (err) {
+        res.send(err);
+        return;
+      }
+
+      res.json(stories);
+
+    });
   });
+
+  //authenticate for angular api
+//in order to get/fetch the decoded/logged in user's token/data..
+  api.get('/me', function(req, res) {
+    res.json(req.decoded);
+  });
+
 
       return api
 
