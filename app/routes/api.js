@@ -1,8 +1,26 @@
 var User        = require('../models/user-models'),
     config      = require('../../config'),//to use our secretKey
     secretKey   = config.secretKey;
+//*1 -
+var jwt         = require('jsonwebtoken');    
 
-    module.exports = function(app, express) {
+//*2 -
+function createToken(user) {
+
+  var token = jwt.sign({
+    _id: user._id,
+    name: user.name,
+    username: user.username
+  }, secretKey, {
+    expiresinMinute: 1440
+  });
+
+  return token;//*3 -
+
+}
+
+
+module.exports = function(app, express) {
 
       var api = express.Router();
 //create user route
@@ -39,6 +57,48 @@ var User        = require('../models/user-models'),
 
       res.json(users);
     }); //mongoose find method
+  });
+
+//
+  api.post('/login', function(req, res) {
+
+    User.findOne({
+      username: req.body.username
+    }).select('password').exec(function(err, user) {
+
+      if(err) throw err;
+
+      if (!user) {
+
+        res.send({
+          message: "This user does not exist."
+        });
+      } else if(user){
+
+        var validPassword = user.comparePassword(req.body.password);
+
+        if (!validPassword) {
+          res.send({
+            message: "Invalid Password!"
+          })
+        } else {
+          
+          //4* - pass created token to the user that logs in
+          var token = createToken(user);
+
+          res.json({
+            success: true,
+            message: "Successful Login!",
+            token: token
+
+          });
+
+        }
+
+      }
+
+    });
+
   });
 
       return api
