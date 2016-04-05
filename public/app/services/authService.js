@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    angular.module('authService', []);
+    angular.module('authService', [])
     // A U T H  F A C T O R Y  
     .factory('AuthFactory', function($http, $q, AuthToken) {
 
@@ -73,7 +73,7 @@
 
       return authTokenFactory;
 
-    });
+    })
 
 /// TOKEN  I N T E R C E P T O R     
   
