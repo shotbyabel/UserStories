@@ -25,8 +25,8 @@
       authFactory.logout = function() {
         AuthToken.setToken();
       }
-
-      //check if user is logged in
+     ////// 
+    ///check if user is logged in
       authFactory.isLoggedIN = function() {
         if (AuthToken.getToken())
           return true;
@@ -45,6 +45,8 @@
             message: "User has no token!"
           });
       }
+
+      return authFactory;
 
     })
 
@@ -69,9 +71,36 @@
           $window.localStorage.removeItem('token');
       }
 
+      return authTokenFactory;
 
-    })
+    });
 
+/// TOKEN  I N T E R C E P T O R     
+  
+  .factory('TokenInterceptor', function($q, $location, AuthToken) {
+
+    var tokenInterceptor = {};
+
+    tokenInterceptor.request = function(config) {//request if token exist in localStorage
+
+      var token = AuthToken.getToken();
+
+      if (token) {
+        config.headers['x-access-token'] = token;
+      }
+
+      return config;
+    };
+//error checking
+  tokenInterceptor.responseError = function(response) {
+    if(response.status == 403)
+      $location.path('/login');
+
+    return $q.reject(response);
+  }
+
+
+  })
 
 
 
