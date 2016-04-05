@@ -3,7 +3,7 @@
 
     angular.module('authService', []);
     // A U T H  F A C T O R Y  
-    .factory('Auth', function($http, $q, AuthToken) {
+    .factory('AuthFactory', function($http, $q, AuthToken) {
 
       var authFactory = {};
 
@@ -100,7 +100,9 @@
   }
 
 
-  })
+  return tokenInterceptor;
+
+  });
 
 
 
